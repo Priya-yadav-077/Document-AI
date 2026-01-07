@@ -1,0 +1,113 @@
+# Model configurations
+models:
+  gemini-1.5-pro:
+    provider: "google"
+    model_name: "gemini-1.5-pro"
+    context_window: 2000000
+    temperature: 0.0
+    max_output_tokens: 1024
+    top_p: 1.0
+  
+  gemini-2.0-flash:
+    provider: "google"
+    model_name: "gemini-2.0-flash"
+    context_window: 1000000
+    temperature: 0.0
+    max_output_tokens: 1024
+    top_p: 1.0
+  
+  llama-3.1-70b:
+    provider: "groq"
+    model_name: "llama-3.1-70b-versatile"
+    context_window: 128000
+    temperature: 0.0
+    max_output_tokens: 1024
+    top_p: 1.0
+  
+  gpt-4-turbo:
+    provider: "openai"
+    model_name: "gpt-4-turbo-preview"
+    context_window: 128000
+    temperature: 0.0
+    max_output_tokens: 1024
+    top_p: 1.0
+
+# Data paths
+data:
+  base_path: "data"
+  train: "qasper-train-v0.3.json"
+  dev: "qasper-dev-v0.3.json"
+  test: "qasper-test-v0.3.json"
+
+# Evaluation settings
+evaluation:
+  batch_size: 1
+  max_samples: null  # null = all samples, or set to number for subset
+  save_predictions: true
+  save_detailed_results: true
+  compute_cost: true
+  rate_limit_delay: 1  # seconds between API calls
+  
+  # Metrics to compute
+  metrics:
+    - answer_f1
+    - evidence_f1
+    - rouge_l
+    - bert_score
+    - exact_match
+
+# Prompt templates
+prompts:
+  default_template: |
+    You are an expert at answering questions about scientific research papers.
+    
+    Paper Title: {title}
+    
+    Paper Content:
+    {full_text}
+    
+    Question: {question}
+    
+    Instructions:
+    1. Answer the question based ONLY on the information in the paper.
+    2. If the paper doesn't contain enough information to answer, respond with "UNANSWERABLE".
+    3. For yes/no questions, start with "Yes" or "No" and provide a brief explanation.
+    4. Be concise and specific in your answer.
+    5. Cite specific sections or evidence when possible.
+    
+    Answer:
+  
+  with_evidence_template: |
+    You are an expert at answering questions about scientific research papers.
+    
+    Paper Title: {title}
+    
+    Paper Content:
+    {full_text}
+    
+    Question: {question}
+    
+    Instructions:
+    1. First, identify the relevant paragraph(s) that contain evidence for answering the question.
+    2. Then, provide your answer based on that evidence.
+    3. Format your response as:
+       
+       EVIDENCE: [quote the relevant paragraph(s)]
+       
+       ANSWER: [your answer based on the evidence]
+    
+    4. If the paper doesn't contain enough information, respond with "UNANSWERABLE".
+    
+    Response:
+
+# Output paths
+output:
+  results_dir: "results"
+  predictions_dir: "predictions"
+  logs_dir: "logs"
+  plots_dir: "plots"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
