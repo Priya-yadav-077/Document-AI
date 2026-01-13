@@ -10,7 +10,7 @@ PDF_FILEPATH = "/home/students/yadav/workspace/Multimodal_project/1706.03762v7.p
 #CHROMA_PATH = str(ROOT / "chroma_store")
 
 # Chroma DB persistence directory
-CHROMA_PATH = str(ROOT / "chroma_store") #path to where vector DB is stored 
+CHROMA_PATH = str(ROOT / "chroma_store") # path to where vector DB is stored 
 
 # Models (local/huggingface)
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"

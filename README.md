@@ -11,9 +11,17 @@ You must run this command first to prepare the PDF data for searching.
 
 ```bash
 python main.py --index
-````
+```
 
 **Note:** Run the index command **every time** you change or add a PDF file.
+
+#### Alternate Loader
+
+In case of difficulty with library "pdf2image" due to missing root rights, fallback to alternate loader with "pypdf":
+
+```bash
+python main.py --index --alternate_loader --pdf_path <<path_to_local_pdf>>
+```
 
 ### 2\. Querying
 
