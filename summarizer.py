@@ -1,16 +1,20 @@
 #text summarization using a pre-trained model
 from transformers import pipeline
+from config import TEXT_SUMMARIZER
 
-TEXT_SUMMARIZER = "google/flan-t5-small"
 _summarizer = None # lazy global variable init so that we don't load model unless needed.
 
 def get_summarizer():
     global _summarizer
-    if _summarizer is None: # checks if the model is already loaded 
-        _summarizer = pipeline( # if not then load it using huggingface pipeline 
+    if _summarizer is None:
+        # Auto-detect device (GPU if available, else CPU)
+        import torch
+        device = 0 if torch.cuda.is_available() else -1
+        print(f"Using device for text summarization: {'GPU' if device == 0 else 'CPU'}")
+        _summarizer = pipeline(
             "text2text-generation",
             model=TEXT_SUMMARIZER,
-            device=0  # GPU
+            device=device
         )
     return _summarizer
 
