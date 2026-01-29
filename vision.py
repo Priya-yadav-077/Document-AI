@@ -9,19 +9,26 @@ from typing import Optional
 _processor = None #prepares the image for the model
 _model = None #produces the image captions
 
-def _init_blip(model_name="Salesforce/blip-image-captioning-large", device=0): #loads it on the cuda if available 
-    global _processor, _model # use global variables to load the model and processor only once
+def _init_blip(model_name="Salesforce/blip-image-captioning-large", device=None):
+    global _processor, _model
     if _processor is None:
         _processor = BlipProcessor.from_pretrained(model_name)
     if _model is None:
-        _model = BlipForConditionalGeneration.from_pretrained(model_name).to(f"cuda:{device}" if device >= 0 else "cpu")
+        # Auto-detect device
+        import torch
+        if device is None:
+            device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        else:
+            device = f"cuda:{device}" if device >= 0 else "cpu"
+        print(f"Using device for image captioning: {device}")
+        _model = BlipForConditionalGeneration.from_pretrained(model_name).to(device)
     return _processor, _model
 
 def decode_b64_to_pil(b64: str) -> Image.Image: # convert base64 string back to PIL image, to be used as input to the BLIP model
     data = base64.b64decode(b64)
     return Image.open(io.BytesIO(data)).convert("RGB")
 
-def summarize_image(image_b64: str, surrounding_text: Optional[str] = None, model_name=None, device=0) -> str:
+def summarize_image(image_b64: str, surrounding_text: Optional[str] = None, model_name=None, device=None) -> str:
     """
     Returns a combined caption: BLIP caption + optional surrounding context to improve usefulness.
     """

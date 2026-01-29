@@ -1,18 +1,24 @@
-# requirements.txt
-    
-python-dotenv
-chromadb
-tiktoken
-unstructured[pdf]            
-unstructured-client        
-sentence-transformers
-transformers
-accelerate
-pillow
-lxml
-#  PyTorch  which is compatible with CUDA 12.1 onwards and also with python 3.9 and 3.10 not sure about other versions.
-#make sure your pytorch packages is compatible with cuda version installed in your system which in turen is compatible with your python version.
+# PyTorch packages (CUDA 12.1) - Compatible with Python 3.9, 3.10, 3.12
+# Note: Extra index must be specified before torch packages
+--extra-index-url https://download.pytorch.org/whl/cu121
+
 torch==2.5.1+cu121
 torchvision==0.20.1+cu121
 torchaudio==2.5.1+cu121
---extra-index-url https://download.pytorch.org/whl/cu121
+
+# Core dependencies
+python-dotenv
+chromadb
+tiktoken
+sentence-transformers
+transformers>=4.45.0  # Minimum version for Llama 3.2 support
+accelerate
+bitsandbytes  # For 4-bit quantization (optional, speeds up Llama)
+
+# Document processing
+unstructured[pdf]
+unstructured-client
+
+# Image and data processing
+pillow
+lxml
