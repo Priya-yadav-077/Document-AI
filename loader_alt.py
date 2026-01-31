@@ -31,7 +31,7 @@ def load_pdf_text_table_elements(pdf_path: str = None) -> List[Dict[str, Any]]:
         languages=["eng"],            
     )
 
-    print(chunks)
+    # print(chunks)
 
     elements = []
     for c in chunks:
