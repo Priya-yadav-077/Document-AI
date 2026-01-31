@@ -1,39 +1,46 @@
-# loader.py-PDF extraction using unstructured
+# loader.py - PDF extraction using unstructured
 import base64
+import os
 from typing import List, Dict, Any
 from unstructured.partition.pdf import partition_pdf
 from config import PDF_FILEPATH
 
 def safe_page_number(c):
-    """Extract page_number safely from ElementMetadata.or if the 
-    page_number is not there then it returns none and not let the pipeline break"""
+    """Extract page_number safely from ElementMetadata."""
     if hasattr(c, "metadata") and hasattr(c.metadata, "page_number"):
         return c.metadata.page_number
     return None
 
-def load_pdf_elements(pdf_path: str = None, use_alternate_loader: bool = False) -> List[Dict[str, Any]]:
+def load_pdf_elements(pdf_path: str = None) -> List[Dict[str, Any]]:
     """
     Use unstructured.partition.pdf to extract elements.
     Returns a list of dicts: {'type': 'text'|'table'|'image', 'content': str or base64, 'meta': {...}}
     """
-    if use_alternate_loader:
-        print("Using alternate PDF loader...")
-        from loader_alt import load_pdf_text_table_elements, load_pdf_image_elements
-        text_table_elements = load_pdf_text_table_elements(pdf_path)
-        image_elements = load_pdf_image_elements(pdf_path)
-        print(f"Extracted {len(text_table_elements)} text/table elements and {len(image_elements)} image elements.")
-        return text_table_elements + image_elements
+    pdf_path = pdf_path or PDF_FILEPATH
     
-    pdf_path = pdf_path or PDF_FILEPATH # if the caller passes a path use that other wise 
-    # fall back to a default path
+    # Validate PDF path exists
+    if not pdf_path:
+        raise FileNotFoundError(
+            "No PDF file found. Please place a PDF file in the project directory or specify the path."
+        )
+    
+    if not os.path.exists(pdf_path):
+        raise FileNotFoundError(
+            f"PDF file not found at: {pdf_path}\n"
+            f"Please check the file path and make sure the PDF exists."
+        )
+    
+    print(f"Loading PDF from: {pdf_path}")
+    
+    # Use hi_res strategy with pdfminer backend (more reliable than pdfplumber)
     chunks = partition_pdf(
         filename=pdf_path,
+        strategy="hi_res",  # More accurate extraction
         infer_table_structure=True,
         chunking_strategy="by_title",
         extract_images_in_pdf=True,
         extract_image_block_types=['Image'],
         extract_image_block_to_payload=True,
-        pdf_parser="pdfplumber"
     )
 
     elements = []

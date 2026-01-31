@@ -1,0 +1,35 @@
+# Additional dependencies for QASPER Evaluation
+# Install these on top of the base requirements.txt
+# Usage: pip install -r requirements_eval.txt
+
+# HuggingFace Datasets library for loading QASPER
+datasets>=2.14.0
+
+# Evaluation metrics library
+evaluate>=0.4.0
+
+# BERTScore for semantic similarity evaluation
+bert-score>=0.3.13
+
+# ROUGE metrics for text summarization evaluation
+rouge-score>=0.1.2
+
+# NLTK for text processing (required by some metrics)
+nltk>=3.8
+
+# Data manipulation and analysis
+pandas>=1.5.0
+numpy>=1.23.0
+
+# Progress bars (for batch processing)
+tqdm>=4.65.0
+
+# JSON handling (usually included in Python but explicit version)
+jsonlines>=3.1.0
+
+# Optional: For result visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Optional: For advanced metrics
+sacrebleu>=2.3.0
