@@ -1,0 +1,158 @@
+Loading QASPER dataset...
+Loading QASPER dataset (split=validation)...
+Loaded 281 papers from QASPER
+
+Indexing papers...
+Initializing QASPER evaluation index...
+Using device for embeddings: cuda:0
+QASPER index initialized at: /pfs/data6/home/hd/hd_hd/hd_ea226/Document-AI/Document-AI/chroma_qasper_eval
+
+Indexing 281 papers into QASPER evaluation index...
+
+Successfully indexed 281 papers
+Total chunks in index: 1124
+
+Testing query...
+Using device for reranker: cuda
+Using device for QA: GPU
+Using device for generative QA: GPU
+Loading Llama model: meta-llama/Llama-3.2-3B-Instruct
+
+Answer: The main contribution of this paper is to address the issue of zero-shot translation in Neural Machine Translation (NMT) using transfer learning, particularly in scenarios where there is a large amount of parallel data for the pivot language but limited or no parallel data for the target language. The authors argue that the existing transfer learning approaches fail due to the language space mismatch problem, also known as the domain shift problem, which occurs when the source and pivot languages have different feature distributions. To overcome this limitation, the authors propose a novel approach that minimizes the discrepancy between the feature distributions of different source languages, ensuring a smoother transition between the parent and child models. By doing so, they aim to improve the performance of transfer learning in NMT even in zero-resource settings, where only parallel data for the pivot language is available.
+
+Used 4 context chunks
+================================================================================
+RUNNING EVALUATION WITH OPTIMIZED HYBRID QA SETTINGS
+================================================================================
+Settings:
+  - Initial retrieval: 20 chunks
+  - Similarity threshold: 0.2
+  - Reranker top-K: 6 chunks
+  - Context window: 3000 chars
+  - Hybrid QA: Extractive (RoBERTa) + Generative (Llama)
+================================================================================
+
+================================================================================
+STARTING QASPER EVALUATION
+================================================================================
+Total questions available: 927
+Evaluating on first 50 questions
+
+Generating answers...
+
+================================================================================
+EVALUATION RESULTS
+================================================================================
+Questions evaluated: 50
+Two-stage filtering: Enabled
+Hybrid extractive+generative QA: Enabled
+
+Average Metrics:
+  f1: 0.2143
+  exact_match: 0.0000
+  rouge1: 0.2740
+  rouge2: 0.0679
+  rougeL: 0.1566
+  pred_length: 111.5200
+  ref_length: 118.6400
+  bertscore_precision: 0.8410
+  bertscore_recall: 0.8296
+  bertscore_f1: 0.8349
+
+Predictions saved to: evaluation_results_baseline/qasper_predictions_with_filtering_hybrid.json
+
+================================================================================
+OPTIMIZED RESULTS SUMMARY
+================================================================================
+f1                  : 0.2143
+exact_match         : 0.0000
+rouge1              : 0.2740
+rouge2              : 0.0679
+rougeL              : 0.1566
+pred_length         : 111.5200
+ref_length          : 118.6400
+bertscore_precision : 0.8410
+bertscore_recall    : 0.8296
+bertscore_f1        : 0.8349
+================================================================================
+================================================================================
+RUNNING BASELINE EVALUATION (GENERATIVE-ONLY, NO FILTERING)
+================================================================================
+This uses only Llama (no extractive QA) for comparison
+================================================================================
+
+================================================================================
+STARTING QASPER EVALUATION
+================================================================================
+Total questions available: 927
+Evaluating on first 50 questions
+
+Generating answers...
+
+================================================================================
+EVALUATION RESULTS
+================================================================================
+Questions evaluated: 50
+Two-stage filtering: Enabled
+Hybrid extractive+generative QA: Disabled
+
+Average Metrics:
+  f1: 0.2087
+  exact_match: 0.0000
+  rouge1: 0.2706
+  rouge2: 0.0613
+  rougeL: 0.1534
+  pred_length: 105.5000
+  ref_length: 118.6400
+  bertscore_precision: 0.8417
+  bertscore_recall: 0.8284
+  bertscore_f1: 0.8347
+
+Predictions saved to: evaluation_results_baseline/qasper_predictions_with_filtering_generative_only.json
+
+================================================================================
+BASELINE RESULTS SUMMARY
+================================================================================
+f1                  : 0.2087
+exact_match         : 0.0000
+rouge1              : 0.2706
+rouge2              : 0.0613
+rougeL              : 0.1534
+pred_length         : 105.5000
+ref_length          : 118.6400
+bertscore_precision : 0.8417
+bertscore_recall    : 0.8284
+bertscore_f1        : 0.8347
+================================================================================
+
+================================================================================
+PERFORMANCE COMPARISON: OPTIMIZED vs BASELINE
+================================================================================
+Metric               |     Baseline |    Optimized |  Improvement
+--------------------------------------------------------------------------------
+f1                   |       0.2087 |       0.2143 |       +2.70%
+exact_match          |       0.0000 |       0.0000 |       +0.00%
+rouge1               |       0.2706 |       0.2740 |       +1.26%
+rouge2               |       0.0613 |       0.0679 |      +10.90%
+rougeL               |       0.1534 |       0.1566 |       +2.11%
+pred_length          |     105.5000 |     111.5200 |       +5.71%
+ref_length           |     118.6400 |     118.6400 |       +0.00%
+bertscore_precision  |       0.8417 |       0.8410 |       -0.09%
+bertscore_recall     |       0.8284 |       0.8296 |       +0.14%
+bertscore_f1         |       0.8347 |       0.8349 |       +0.02%
+================================================================================
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc3n082
+Job ID: 3119741
+Cluster: uc3
+User/Group: hd_ea226/hd_hd
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 4
+CPU Utilized: 00:04:43
+CPU Efficiency: 20.63% of 00:22:52 core-walltime
+Job Wall-clock time: 00:05:43
+Memory Utilized: 7.09 GB
+Memory Efficiency: 44.33% of 16.00 GB (16.00 GB/node)

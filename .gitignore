@@ -55,8 +55,9 @@ outputs/
 # Logs
 *.log
 
-# Chroma database
-chroma_store/
+# Chroma database and dependencies
+chroma_store/ 
+chroma_qasper_eval/
 
 #pdfs
 pdfs/

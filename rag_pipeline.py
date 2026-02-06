@@ -4,6 +4,7 @@ import uuid
 import json
 from typing import Dict, Any, List, Optional
 
+import numpy as np
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb import PersistentClient
@@ -123,13 +124,13 @@ def _reset_collection(client: PersistentClient, collection_name: str = "multimod
     # create and return new collection
     return client.create_collection(name=collection_name)
 
-def setup_retriever(pdf_path: Optional[str] = None) -> bool:
+def setup_retriever(pdf_path: Optional[str] = None, use_alternate_loader: bool = False) -> bool:
     """
     Extract -> summarize -> embed -> store in Chroma.
     pdf_path: explicit path to PDF file, if None uses config default
     Returns True if indexing succeeded.
     """
-    elements = load_pdf_elements(pdf_path)
+    elements = load_pdf_elements(pdf_path, use_alternate_loader=use_alternate_loader)
     if not elements:
         raise RuntimeError("No elements extracted from PDF. Check file path and extraction.")
 
@@ -264,7 +265,15 @@ def apply_relevance_filtering(
         print(f"Rank {idx+1}: Score = {score:.4f} [{selected}]")
         print(f"Preview: {doc[:150]}...")
         print()
-    
+    mean_reranked_scores = np.mean([item[0] for item in scored_results[:TOP_K_AFTER_RERANK]])
+    # Get avg margin to next m candidate scores
+    marg_scores = []
+    for cand_idx, (score, doc, meta, doc_id) in enumerate(scored_results[TOP_K_AFTER_RERANK:]):
+        marg_scores.append(mean_reranked_scores - score)
+    avg_margin = np.mean(marg_scores) if marg_scores else 0.0
+    # print(f"\nAverage reranker score for selected top-{TOP_K_AFTER_RERANK}: {mean_reranked_scores:.4f}")
+    print(f"Average margin to next {cand_idx} candidates: {avg_margin:.4f}")
+
     reranked_docs = [item[1] for item in scored_results[:TOP_K_AFTER_RERANK]]
     reranked_metas = [item[2] for item in scored_results[:TOP_K_AFTER_RERANK]]
     reranked_ids = [item[3] for item in scored_results[:TOP_K_AFTER_RERANK]]
@@ -350,18 +359,19 @@ def query_rag(question: str, top_k: int = None) -> Dict[str, Any]:
             # Check if using Llama (needs different prompting)
             if "llama" in GENERATIVE_QA_MODEL.lower():
                 # Llama chat format with system + user messages
-                prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+                prompt = f"""
+                <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-You are a helpful AI assistant analyzing research papers. Answer questions based on the provided context. Synthesize information and provide clear, comprehensive answers.<|eot_id|><|start_header_id|>user<|end_header_id|>
+                You are a helpful AI assistant analyzing research papers. Answer questions based on the provided context. Synthesize information and provide clear, comprehensive answers.<|eot_id|><|start_header_id|>user<|end_header_id|>
 
-Context:
-{clean_context[:CONTEXT_MAX_CHARS]}
+                Context:
+                {clean_context[:CONTEXT_MAX_CHARS]}
 
-Question: {question}
+                Question: {question}
 
-Provide a clear and comprehensive answer based on the context above.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+                Provide a clear and comprehensive answer based on the context above. In case of a Yes/No answer, please restrict the answer to a single word: "Yes" or "No".<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-"""
+                """
                 result = gen_qa(
                     prompt,
                     max_new_tokens=ANSWER_MAX_LENGTH,

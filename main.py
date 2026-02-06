@@ -7,11 +7,12 @@ def main():
     parser.add_argument("--index", action="store_true", help="Build the index from the PDF.")
     parser.add_argument("--query", type=str, help="Ask a question to the indexed document.")
     parser.add_argument("--pdf", type=str, help="Path to PDF file (optional, uses auto-detect if not provided).")
+    parser.add_argument("--alternate_loader", action="store_true", help="Use alternate PDF loader.")
     args = parser.parse_args()
 
     if args.index:
         print("Indexing document (this may take a few minutes)...")
-        setup_retriever(pdf_path=args.pdf) 
+        setup_retriever(pdf_path=args.pdf, use_alternate_loader=args.alternate_loader) 
         print("Indexing complete. You can now run queries with --query.")
         return
 

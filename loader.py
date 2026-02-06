@@ -11,12 +11,13 @@ def safe_page_number(c):
         return c.metadata.page_number
     return None
 
-def load_pdf_elements(pdf_path: str = None) -> List[Dict[str, Any]]:
+def load_pdf_elements(pdf_path: str = None, use_alternate_loader: bool = False) -> List[Dict[str, Any]]:
     """
     Use unstructured.partition.pdf to extract elements.
     Returns a list of dicts: {'type': 'text'|'table'|'image', 'content': str or base64, 'meta': {...}}
     """
     pdf_path = pdf_path or PDF_FILEPATH
+    print(f"Loading PDF elements from: {pdf_path}")
     
     # Validate PDF path exists
     if not pdf_path:
@@ -30,7 +31,13 @@ def load_pdf_elements(pdf_path: str = None) -> List[Dict[str, Any]]:
             f"Please check the file path and make sure the PDF exists."
         )
     
-    print(f"Loading PDF from: {pdf_path}")
+    if use_alternate_loader:
+        print("Using alternate PDF loader...")
+        from loader_alt import load_pdf_text_table_elements, load_pdf_image_elements
+        text_table_elements = load_pdf_text_table_elements(pdf_path)
+        image_elements = load_pdf_image_elements(pdf_path)
+        print(f"Extracted {len(text_table_elements)} text/table elements and {len(image_elements)} image elements.")
+        return text_table_elements + image_elements
     
     # Use hi_res strategy with pdfminer backend (more reliable than pdfplumber)
     chunks = partition_pdf(
